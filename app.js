@@ -29,6 +29,25 @@ const apiLimiter = rateLimit({
 
 app.use(express.urlencoded({ extended: false }));
 app.use(apiLimiter)
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+      cookie: {
+        maxAge: 60000 * 60 * 24 * 7,
+        sameSite: "lax",
+        httpOnly: true,
+        secure: false,
+      },
+      store:MongoStore.create({
+        collectionName: "session",
+        mongoUrl: DB_URI,
+        ttl: 60000 * 60 * 24 * 7,
+      })
+
+  })
+)
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/products", productRouter);
